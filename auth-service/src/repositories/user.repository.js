@@ -1,5 +1,15 @@
-const { PrismaClient } = require("@prisma/client");
+const prisma = require("../lib/prisma");
 
-const prisma = new PrismaClient();
+module.exports = {
+  findByEmail(email) {
+    return prisma.user.findUnique({
+      where: { email }
+    });
+  },
 
-module.exports = prisma;
+  createUser(data) {
+    return prisma.user.create({
+      data
+    });
+  }
+};
