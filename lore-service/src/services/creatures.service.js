@@ -16,7 +16,8 @@ class CreatureService {
         return await creatureRepository.create({
             name: name.trim(),
             origin: origin || 'Inconnu',
-            authorId
+            authorId,
+            legendScore: 1.0
         });
     }
 
@@ -28,8 +29,8 @@ class CreatureService {
         return creature;
     }
 
-    async getAllCreatures() {
-        return await creatureRepository.findAll();
+    async getAllCreatures(sortBy = 'createdAt') {
+        return await creatureRepository.findAll(sortBy);
     }
 }
 
