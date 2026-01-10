@@ -3,8 +3,12 @@ const creatureService = require('../services/creatures.service');
 class CreatureController {
     async createCreature(req, res) {
         try {
+            console.log('REQ.USER (controller) =', req.user);
+
             const { name, origin } = req.body;
             const authorId = req.user.id;
+
+            console.log('AUTHOR ID =', authorId);
 
             const creature = await creatureService.createCreature(name, origin, authorId);
             
@@ -29,7 +33,7 @@ class CreatureController {
             res.status(404).json({ error: error.message });
         }
     }
-
+    
     async getAllCreatures(req, res) {
         try {
             const creatures = await creatureService.getAllCreatures();

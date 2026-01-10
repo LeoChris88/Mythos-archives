@@ -2,13 +2,11 @@ const creatureRepository = require('../repositories/creature.repository');
 
 class CreatureService {
     async createCreature(name, origin, authorId) {
-        // Règle : Impossible de créer deux créatures avec le même nom
+        console.log('SERVICE authorId =', authorId);
         const existingCreature = await creatureRepository.findByName(name);
         if (existingCreature) {
             throw new Error('A creature with this name already exists');
         }
-
-        // Validation du nom
         if (!name || name.trim().length === 0) {
             throw new Error('Creature name is required');
         }

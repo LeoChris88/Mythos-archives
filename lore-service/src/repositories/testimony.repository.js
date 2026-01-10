@@ -16,7 +16,6 @@ class TestimonyRepository {
             .sort({ createdAt: -1 });
     }
 
-    // Vérifie si un témoignage récent existe (délai de 5 minutes)
     async findRecentByAuthorAndCreature(authorId, creatureId, minutes = 5) {
         const timeLimit = new Date(Date.now() - minutes * 60 * 1000);
         return await Testimony.findOne({
