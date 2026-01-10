@@ -57,11 +57,14 @@ class TestimonyService {
             throw new Error('This testimony has already been processed');
         }
 
-        return await testimonyRepository.update(testimonyId, {
+        const updatedTestimony = await testimonyRepository.update(testimonyId, {
             status: 'VALIDATED',
             validatedBy: validatorId,
             validatedAt: new Date()
         });
+        await this.updateCreatureLegendScore(testimony.creatureId);
+
+        return updatedTestimony;
     }
 
     async rejectTestimony(testimonyId, validatorId, validatorRole) {
@@ -87,6 +90,14 @@ class TestimonyService {
             validatedBy: validatorId,
             validatedAt: new Date()
         });
+    }
+    async updateCreatureLegendScore(creatureId) {
+        try {
+            const validatedCount = await creatureRepository.countValidatedTestimonies(creatureId);
+            await creatureRepository.updateLegendScore(creatureId, validatedCount);
+        } catch (error) {
+            console.error('Error updating legend score:', error);
+        }
     }
 }
 

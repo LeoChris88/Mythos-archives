@@ -14,8 +14,26 @@ class CreatureRepository {
         return await Creature.findOne({ name });
     }
 
-    async findAll() {
-        return await Creature.find().sort({ createdAt: -1 });
+    async findAll(sortBy = 'createdAt') {
+        const sortOrder = sortBy === 'legendScore' ? -1 : 1;
+        return await Creature.find().sort({ [sortBy]: sortOrder });
+    }
+
+    async updateLegendScore(creatureId, validatedTestimoniesCount) {
+        const legendScore = 1 + (validatedTestimoniesCount / 5);
+
+        return await Creature.findByIdAndUpdate(
+            creatureId,
+            { legendScore },
+            { new: true }
+        );
+    } 
+    async countValidatedTestimonies(creatureId) {
+        const Testimony = require('../models/Testimony');
+        return await Testimony.countDocuments({
+            creatureId,
+            status: 'VALIDATED'
+        });
     }
 }
 

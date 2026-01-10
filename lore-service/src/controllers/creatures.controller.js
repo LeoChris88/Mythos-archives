@@ -36,10 +36,16 @@ class CreatureController {
     
     async getAllCreatures(req, res) {
         try {
+            const { sortBy } = req.query;
+
+            const validSortOptions = ['legendScore', 'createdAt'];
+            const sortOption = validSortOptions.includes(sortBy) ? sortBy : 'createdAt';
+
             const creatures = await creatureService.getAllCreatures();
             
             res.status(200).json({
                 count: creatures.length,
+                sortBy: sortOption,
                 creatures
             });
         } catch (error) {
