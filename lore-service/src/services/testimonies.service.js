@@ -1,5 +1,6 @@
 const testimonyRepository = require('../repositories/testimony.repository');
 const creatureRepository = require('../repositories/creature.repository');
+const authClient = require('../clients/auth.client');
 
 class TestimonyService {
     async createTestimony(creatureId, authorId, description) {
@@ -64,6 +65,20 @@ class TestimonyService {
         });
         await this.updateCreatureLegendScore(testimony.creatureId);
 
+        await authClient.addReputation(
+            testimony.authorId,
+            +3,
+            token
+        );
+
+            if (validatorRole === 'EXPERT') {
+            await authClient.addReputation(
+                validatorId,
+                +1,
+                token
+            );
+        }
+
         return updatedTestimony;
     }
 
@@ -85,12 +100,29 @@ class TestimonyService {
             throw new Error('This testimony has already been processed');
         }
 
+        await authClient.addReputation(
+            testimony.authorId,
+            -1,
+            token
+        );
+
         return await testimonyRepository.update(testimonyId, {
             status: 'REJECTED',
             validatedBy: validatorId,
             validatedAt: new Date()
         });
     }
+
+    async getTestimonyById(id) {
+        const testimony = await testimonyRepository.findById(id);
+
+        if (!testimony) {
+            throw new Error('Testimony not found');
+        }
+
+        return testimony;
+    }
+
     async updateCreatureLegendScore(creatureId) {
         try {
             const validatedCount = await creatureRepository.countValidatedTestimonies(creatureId);

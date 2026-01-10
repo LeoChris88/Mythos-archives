@@ -33,5 +33,4 @@ class TestimonyRepository {
         ).populate('creatureId', 'name origin');
     }
 }
-
 module.exports = new TestimonyRepository();

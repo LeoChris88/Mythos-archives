@@ -1,4 +1,6 @@
 const authService = require("../services/auth.service");
+const { PrismaClient } = require("@prisma/client");
+const prisma = new PrismaClient();
 
 const register = async (req, res) => {
   try {
@@ -47,4 +49,26 @@ const listUsers = async (req, res) => {
   }
 };
 
-module.exports = { register, login, me, changeRole, listUsers };
+const updateReputation = async (req, res) => {
+  const { id } = req.params;
+  const { delta } = req.body;
+
+  const user = await prisma.user.update({
+    where: { id: Number(id) },
+    data: {
+      reputation: { increment: delta }
+    }
+  });
+
+  // auto promotion
+  if (user.reputation >= 10 && user.role === 'USER') {
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { role: 'EXPERT' }
+    });
+  }
+
+  res.json(user);
+}
+
+module.exports = { register, login, me, changeRole, listUsers, updateReputation };
