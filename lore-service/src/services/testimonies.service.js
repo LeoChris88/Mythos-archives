@@ -1,6 +1,6 @@
 const testimonyRepository = require('../repositories/testimony.repository');
 const creatureRepository = require('../repositories/creature.repository');
-const authClient = require('../clients/auth.client');
+const { updateUserReputation } = require('../utils/reputation.helper');
 
 class TestimonyService {
     async createTestimony(creatureId, authorId, description) {
@@ -40,7 +40,7 @@ class TestimonyService {
         return await testimonyRepository.findByCreatureId(creatureId);
     }
 
-    async validateTestimony(testimonyId, validatorId, validatorRole, token) {
+    async validateTestimony(testimonyId, validatorId, validatorRole) {
         if (!['EXPERT', 'ADMIN'].includes(validatorRole)) {
             throw new Error('Only EXPERT or ADMIN can validate testimonies');
         }
@@ -63,20 +63,11 @@ class TestimonyService {
             validatedBy: validatorId,
             validatedAt: new Date()
         });
-        await this.updateCreatureLegendScore(testimony.creatureId);
 
-        await authClient.addReputation(
-            testimony.authorId,
-            +3,
-            token
-        );
-
-            if (validatorRole === 'EXPERT') {
-            await authClient.addReputation(
-                validatorId,
-                +1,
-                token
-            );
+        await updateUserReputation(testimony.authorId, 3);
+        
+        if (validatorRole === 'EXPERT') {
+            await updateUserReputation(validatorId, 1);
         }
 
         await this.updateCreatureLegendScore(testimony.creatureId);
@@ -84,7 +75,7 @@ class TestimonyService {
         return updatedTestimony;
     }
 
-    async rejectTestimony(testimonyId, validatorId, validatorRole, token) {
+    async rejectTestimony(testimonyId, validatorId, validatorRole) {
         if (!['EXPERT', 'ADMIN'].includes(validatorRole)) {
             throw new Error('Only EXPERT or ADMIN can reject testimonies');
         }
@@ -102,27 +93,15 @@ class TestimonyService {
             throw new Error('This testimony has already been processed');
         }
 
-        await authClient.addReputation(
-            testimony.authorId,
-            -1,
-            token
-        );
-
-        return await testimonyRepository.update(testimonyId, {
+        const updatedTestimony = await testimonyRepository.update(testimonyId, {
             status: 'REJECTED',
             validatedBy: validatorId,
             validatedAt: new Date()
         });
-    }
 
-    async getTestimonyById(id) {
-        const testimony = await testimonyRepository.findById(id);
+        await updateUserReputation(testimony.authorId, -1);
 
-        if (!testimony) {
-            throw new Error('Testimony not found');
-        }
-
-        return testimony;
+        return updatedTestimony;
     }
 
     async updateCreatureLegendScore(creatureId) {

@@ -72,7 +72,6 @@ class TestimonyController {
                 id,
                 validatorId,
                 validatorRole,
-                token
             );
 
             res.status(200).json({

@@ -13,6 +13,6 @@ router.post("/login", authController.login);
 router.get("/me", authMiddleware, authController.me);
 router.get("/admin/users", authMiddleware, isAdmin, authController.listUsers);
 router.patch("/users/:id/role", authMiddleware, isAdmin, authController.changeRole);
-router.patch("/users/:id/reputation", authMiddleware, isAdmin, authController.updateReputation);
+router.patch("/users/:id/reputation", authController.updateReputation);
 
 module.exports = router;
