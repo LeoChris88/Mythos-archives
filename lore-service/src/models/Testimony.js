@@ -1,23 +1,34 @@
 const mongoose = require('mongoose');
 
 const testimonySchema = new mongoose.Schema({
-  authorId: {
-    type: Number,
-    required: true
-  },
   creatureId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Creature',
+    required: true
+  },
+  authorId: {
+    type: Number, // ID venant du auth-service (SQL)
     required: true
   },
   description: {
     type: String,
     required: true
   },
-  validated: {
-    type: Boolean,
-    default: false
+  status: {
+    type: String,
+    enum: ['PENDING', 'VALIDATED', 'REJECTED'],
+    default: 'PENDING'
+  },
+  validatedBy: {
+    type: Number,
+    default: null
+  },
+  validatedAt: {
+    type: Date,
+    default: null
   }
-}, { timestamps: true });
+}, {
+  timestamps: true
+});
 
 module.exports = mongoose.model('Testimony', testimonySchema);

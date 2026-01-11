@@ -7,7 +7,7 @@ const authClient = axios.create({
 module.exports = {
   addReputation: async (userId, delta, token) => {
     return authClient.patch(
-      `/users/${userId}/reputation`,
+      `/auth/users/${userId}/reputation`,
       { delta },
       {
         headers: {

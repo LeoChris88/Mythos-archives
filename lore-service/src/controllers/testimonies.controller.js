@@ -43,15 +43,18 @@ class TestimonyController {
             const validatorId = req.user.id;
             const validatorRole = req.user.role;
 
+            const token = req.headers.authorization?.split(' ')[1];
+
             const testimony = await testimonyService.validateTestimony(
-                id,
-                validatorId,
-                validatorRole
+            id,
+            validatorId,
+            validatorRole,
+            token
             );
 
             res.status(200).json({
-                message: 'Testimony validated successfully',
-                testimony
+            message: 'Testimony validated successfully',
+            testimony
             });
         } catch (error) {
             console.error('Validate testimony error:', error);
@@ -68,7 +71,8 @@ class TestimonyController {
             const testimony = await testimonyService.rejectTestimony(
                 id,
                 validatorId,
-                validatorRole
+                validatorRole,
+                token
             );
 
             res.status(200).json({

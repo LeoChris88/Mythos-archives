@@ -40,7 +40,7 @@ class TestimonyService {
         return await testimonyRepository.findByCreatureId(creatureId);
     }
 
-    async validateTestimony(testimonyId, validatorId, validatorRole) {
+    async validateTestimony(testimonyId, validatorId, validatorRole, token) {
         if (!['EXPERT', 'ADMIN'].includes(validatorRole)) {
             throw new Error('Only EXPERT or ADMIN can validate testimonies');
         }
@@ -79,10 +79,12 @@ class TestimonyService {
             );
         }
 
+        await this.updateCreatureLegendScore(testimony.creatureId);
+
         return updatedTestimony;
     }
 
-    async rejectTestimony(testimonyId, validatorId, validatorRole) {
+    async rejectTestimony(testimonyId, validatorId, validatorRole, token) {
         if (!['EXPERT', 'ADMIN'].includes(validatorRole)) {
             throw new Error('Only EXPERT or ADMIN can reject testimonies');
         }
